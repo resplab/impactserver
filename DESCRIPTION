@@ -18,3 +18,5 @@ Import:
    ggplot2 (>= 3.4.0),
    ggthemes (>= 4.2.4),
    stringr (>= 1.5.0)
+   DT
+   storr
