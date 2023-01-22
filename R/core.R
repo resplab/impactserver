@@ -37,7 +37,7 @@ Connect <- function(db, fileSystem=F)
                       host = 'localhost', # i.e. 'ec2-54-83-201-96.compute-1.amazonaws.com'
                       port = 5432, # or any other port specified by your DBA
                       user = 'postgres',
-                      password = 'mohsen')
+                      password = 'postgres')
     globalVars$con <- con
     st <- storr_dbi(paste0(db,"Data"), paste0(db,"Keys"), con=con)
   }
