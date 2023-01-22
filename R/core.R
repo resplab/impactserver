@@ -15,6 +15,16 @@
 
 
 #Internal for unviersally formatted datetime
+#' @export
+GetDBPath <- function(db)
+{
+  basePath <- unname(ifelse(Sys.info()["sysname"]=="Linux", "/var/lib/impactserver/storr/" ,"C:/Users/msafavi/test/storr/settings/"))
+  paste0(basePath,db)
+}
+
+
+
+
 timeStamp <- function()
 {
   as.character(Sys.time())
@@ -26,7 +36,7 @@ timeStamp <- function()
 #' @export
 Set <- function(val1,val2) {
   require(storr)
-  st <- storr::storr_rds(path="C:\\Users\\msafavi\\test\\storr\\settings")
+  st <- storr::storr_rds(path=GetDBPath("settings"))
   st$set(val1,val2)
 }
 
@@ -34,7 +44,7 @@ Set <- function(val1,val2) {
 #' @export
 Get <- function(val1) {
   require(storr)
-  st <- storr::storr_rds(path="C:\\Users\\msafavi\\test\\storr\\settings")
+  st <- storr::storr_rds(path=GetDBPath("settings"))
   st$get(val1)
 }
 
@@ -44,7 +54,7 @@ Get <- function(val1) {
 #' @export
 SaveSettings <- function(user,settingVars) {
   require(storr)
-  st <- storr::storr_rds(path="C:\\Users\\msafavi\\test\\storr\\settings")
+  st <- storr::storr_rds(path=GetDBPath("settings"))
   st$set(paste0("user.",user),settingVars)
   return(0)
 }
@@ -55,7 +65,7 @@ SaveSettings <- function(user,settingVars) {
 LoadSettings <- function(user) {
   require(storr)
   #require(jsonlite)
-  st <- storr::storr_rds(path="C:\\Users\\msafavi\\test\\storr\\settings")
+  st <- storr::storr_rds(path=GetDBPath("settings"))
   out <- NULL
   if(st$exists(paste0("user.",user)))
   {
@@ -70,6 +80,14 @@ LoadSettings <- function(user) {
 }
 
 
+
+#' @export
+FlushSettings <- function()
+{
+  require(storr)
+  st <- storr::storr_rds(path=GetDBPath("settings"))
+  st$destroy()
+}
 
 
 
@@ -102,6 +120,28 @@ templatePatient <- data.frame( dtAdded=timeStamp(),
 
 
 
+
+
+#' @export
+GetPatients <- function()
+{
+  require(storr)
+  st <- storr::storr_rds(path=GetDBPath("patients"))
+
+  if(st$exists("patients"))
+  {
+    df <- st$get("patients")
+  }
+  else
+  {
+    df <- templatePatient[-1,]
+  }
+
+  df
+}
+
+
+
 # Patchy adding is accepted. DOES NOT CHECK for duplicates
 #' @export
 AddPatient <- function(patient)
@@ -109,7 +149,7 @@ AddPatient <- function(patient)
   success <- F
 
   require(storr)
-  st <- storr::storr_rds(path="C:\\Users\\msafavi\\test\\storr\\patients")
+  st <- storr::storr_rds(path=GetDBPath("patients"))
 
   if(st$exists("patients"))
   {
@@ -125,10 +165,10 @@ AddPatient <- function(patient)
 
   if(length(which(df[,'phn']==phn))==0)
   {
-    patient[,'dtAdded'] <- patient[,'dtActed'] <- timeStamp()
+    patient$dtAdded <- patient$dtActed <- timeStamp()
     for(element in names(patient))
     {
-      if(length(patient[,element])>0)
+      if(length(patient[[element]])>0)
       {
         df[index,element] <- patient[[element]]
       }
@@ -151,7 +191,7 @@ UpdatePatient <- function(patient)
 {
   success <- F
   require(storr)
-  st <- storr::storr_rds(path="C:\\Users\\msafavi\\test\\storr\\patients")
+  st <- storr::storr_rds(path=GetDBPath("patients"))
   if(!st$exists("patients"))
   {
     return(F)
@@ -199,26 +239,6 @@ AddUpdatePatient <- function(patient)
 
 
 
-#' @export
-GetPatients <- function()
-{
-  require(storr)
-  st <- storr::storr_rds(path="C:\\Users\\msafavi\\test\\storr\\patients")
-
-  if(st$exists("patients"))
-  {
-    df <- st$get("patients")
-  }
-  else
-  {
-    df <- templatePatient[-1,]
-  }
-
-  df
-}
-
-
-
 
 #' @export
 GetTemplatePatient <- function()
@@ -233,7 +253,7 @@ GetTemplatePatient <- function()
 FindPatient <- function(patient, tolerance=0)
 {
   require(storr)
-  st <- storr::storr_rds(path="C:\\Users\\msafavi\\test\\storr\\patients")
+  st <- storr::storr_rds(path=GetDBPath("patients"))
   if(!st$exists("patients"))
   {
     return((list()))
@@ -292,7 +312,7 @@ UpdatePHN <- function(oldPhn, newPhn)
 {
   success <- F
   require(storr)
-  st <- storr::storr_rds(path="C:\\Users\\msafavi\\test\\storr\\patients")
+  st <- storr::storr_rds(path=GetDBPath("patients"))
   if(!st$exists("patients"))
   {
     return(F)
@@ -322,7 +342,7 @@ DeletePatient <- function(phn)
 {
   success <- F
   require(storr)
-  st <- storr::storr_rds(path="C:\\Users\\msafavi\\test\\storr\\patients")
+  st <- storr::storr_rds(path=GetDBPath("patients"))
   if(!st$exists("patients"))
   {
     return(F)
@@ -347,7 +367,7 @@ DeletePatient <- function(phn)
 FlushPatients <- function()
 {
   require(storr)
-  st <- storr::storr_rds(path="C:\\Users\\msafavi\\test\\storr\\patients")
+  st <- storr::storr_rds(path=GetDBPath("patients"))
   st$set("patients",GetTemplatePatient()[-1,])
 }
 

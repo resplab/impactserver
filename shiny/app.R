@@ -3,7 +3,7 @@
 library(shiny)
 library(DT)
 library(storr)
-
+library(impactserver)
 
 
 
@@ -29,7 +29,6 @@ shinyApp(
 
   server = function(input, output, session)
   {
-    require(ImpactServer)
     GetData <- function()
     {
       whitelistVars <- c('phn','firstName','lastName','whitelisted')
