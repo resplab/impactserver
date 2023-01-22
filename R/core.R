@@ -14,17 +14,55 @@
 #   Test Package:              'Ctrl + Shift + T'
 
 
-#Internal for unviersally formatted datetime
+
+
 #' @export
-GetDBPath <- function(db)
+GetVersionNote <- function()
 {
-  basePath <- unname(ifelse(Sys.info()["sysname"]=="Linux", "/var/lib/impactserver/storr/" ,"C:/Users/msafavi/test/storr/settings/"))
-  paste0(basePath,db)
+  "Rainy evening (2023.01.21)"
+}
+
+
+globalVars <- new.env()
+
+
+#' @export
+Connect <- function(db, fileSystem=F)
+{
+  require(storr)
+  require(DBI)
+  if(!fileSystem)
+  {
+    con <- dbConnect(RPostgres::Postgres(),
+                      host = 'localhost', # i.e. 'ec2-54-83-201-96.compute-1.amazonaws.com'
+                      port = 5432, # or any other port specified by your DBA
+                      user = 'postgres',
+                      password = 'mohsen')
+    globalVars$con <- con
+    st <- storr_dbi(paste0(db,"Data"), paste0(db,"Keys"), con=con)
+  }
+  else
+  {
+    basePath <- unname(ifelse(Sys.info()["sysname"]=="Linux", "/var/lib/impactserver/storr/" ,"C:/Users/msafavi/test/storr/settings/"))
+    path <- paste0(basePath,db)
+    st <- storr_rds(path=GetDBPath("settings"))
+  }
+}
+
+
+#' @export
+Disconnect <- function()
+{
+  tryCatch(
+    {con <- globalVars$con; DBI::dbDisconnect(con)},
+    error=function(cond){},
+    warning=function(cond){}
+    )
 }
 
 
 
-
+#Internal for unviersally formatted datetime
 timeStamp <- function()
 {
   as.character(Sys.time())
@@ -35,17 +73,17 @@ timeStamp <- function()
 
 #' @export
 Set <- function(val1,val2) {
-  require(storr)
-  st <- storr::storr_rds(path=GetDBPath("settings"))
+  st <- Connect("settings")
   st$set(val1,val2)
+  Disconnect()
 }
 
 
 #' @export
 Get <- function(val1) {
-  require(storr)
-  st <- storr::storr_rds(path=GetDBPath("settings"))
+  st <- Connect("settings")
   st$get(val1)
+  Disconnect()
 }
 
 
@@ -53,19 +91,17 @@ Get <- function(val1) {
 
 #' @export
 SaveSettings <- function(user,settingVars) {
-  require(storr)
-  st <- storr::storr_rds(path=GetDBPath("settings"))
+  st <- Connect("settings")
   st$set(paste0("user.",user),settingVars)
-  return(0)
+  Disconnect()
+  return(T)
 }
 
 
 
 #' @export
 LoadSettings <- function(user) {
-  require(storr)
-  #require(jsonlite)
-  st <- storr::storr_rds(path=GetDBPath("settings"))
+  st <- Connect("settings")
   out <- NULL
   if(st$exists(paste0("user.",user)))
   {
@@ -76,6 +112,7 @@ LoadSettings <- function(user) {
     out <- NULL
   }
 
+  Disconnect()
   out
 }
 
@@ -85,7 +122,7 @@ LoadSettings <- function(user) {
 FlushSettings <- function()
 {
   require(storr)
-  st <- storr::storr_rds(path=GetDBPath("settings"))
+  st <- Connect("settings")
   st$destroy()
 }
 
@@ -121,12 +158,17 @@ templatePatient <- data.frame( dtAdded=timeStamp(),
 
 
 
+#' @export
+GetTemplatePatient <- function()
+{
+  templatePatient
+}
+
 
 #' @export
 GetPatients <- function()
 {
-  require(storr)
-  st <- storr::storr_rds(path=GetDBPath("patients"))
+  st <- Connect("patients")
 
   if(st$exists("patients"))
   {
@@ -136,6 +178,8 @@ GetPatients <- function()
   {
     df <- templatePatient[-1,]
   }
+
+  Disconnect()
 
   df
 }
@@ -148,8 +192,7 @@ AddPatient <- function(patient)
 {
   success <- F
 
-  require(storr)
-  st <- storr::storr_rds(path=GetDBPath("patients"))
+  st <- Connect("patients")
 
   if(st$exists("patients"))
   {
@@ -178,6 +221,8 @@ AddPatient <- function(patient)
 
   st$set("patients",df)
 
+  Disconnect()
+
   success
 }
 
@@ -190,8 +235,8 @@ AddPatient <- function(patient)
 UpdatePatient <- function(patient)
 {
   success <- F
-  require(storr)
-  st <- storr::storr_rds(path=GetDBPath("patients"))
+  st <- Connect("patients")
+
   if(!st$exists("patients"))
   {
     return(F)
@@ -212,6 +257,8 @@ UpdatePatient <- function(patient)
     }
     st$set("patients",df)
   }
+
+  Disconnect()
 
   success
 }
@@ -240,11 +287,6 @@ AddUpdatePatient <- function(patient)
 
 
 
-#' @export
-GetTemplatePatient <- function()
-{
-  templatePatient
-}
 
 
 
@@ -252,8 +294,8 @@ GetTemplatePatient <- function()
 #' @export
 FindPatient <- function(patient, tolerance=0)
 {
-  require(storr)
-  st <- storr::storr_rds(path=GetDBPath("patients"))
+  st <- Connect("patients")
+
   if(!st$exists("patients"))
   {
     return((list()))
@@ -296,6 +338,8 @@ FindPatient <- function(patient, tolerance=0)
     }
   }
 
+  Disconnect()
+
   return(list())
 }
 
@@ -311,8 +355,8 @@ FindPatient <- function(patient, tolerance=0)
 UpdatePHN <- function(oldPhn, newPhn)
 {
   success <- F
-  require(storr)
-  st <- storr::storr_rds(path=GetDBPath("patients"))
+
+  st <- Connect("patients")
   if(!st$exists("patients"))
   {
     return(F)
@@ -332,6 +376,8 @@ UpdatePHN <- function(oldPhn, newPhn)
     }
   }
 
+  Disconnect()
+
   success
 }
 
@@ -341,8 +387,9 @@ UpdatePHN <- function(oldPhn, newPhn)
 DeletePatient <- function(phn)
 {
   success <- F
-  require(storr)
-  st <- storr::storr_rds(path=GetDBPath("patients"))
+
+  st <- Connect("patients")
+
   if(!st$exists("patients"))
   {
     return(F)
@@ -357,6 +404,8 @@ DeletePatient <- function(phn)
     success = T
   }
 
+  Disconnect()
+
   success
 }
 
@@ -366,9 +415,9 @@ DeletePatient <- function(phn)
 #' @export
 FlushPatients <- function()
 {
-  require(storr)
-  st <- storr::storr_rds(path=GetDBPath("patients"))
+  st <- Connect("patients")
   st$set("patients",GetTemplatePatient()[-1,])
+  Disconnect()
 }
 
 
