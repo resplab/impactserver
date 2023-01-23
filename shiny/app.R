@@ -15,40 +15,45 @@ render_dt = function(data, editable = 'cell', server = TRUE, ...) {
 
 
 
-
 shinyApp(
   ui = fluidPage(
     mainPanel(
       headerPanel("IMPACT study coordinator centre"),
       tabsetPanel(type = "tabs",
-                  tabPanel("Clinic day", DTOutput('clinicDay'), actionButton("refresh_btn","Refresh")),
-                  tabPanel("Whitelist", DTOutput('whitelist'), actionButton("add_btn", "New row")),
-                  tabPanel("ACCEPT calculator",h1("Todo"))
+                  tabPanel("Clinic day", selectInput("clinicDayDateSelector","Which day",c(Sys.Date()-1,Sys.Date(),Sys.Date()+1)),  DTOutput('clinicDay'), actionButton("refresh_btn","Refresh")),
+                  tabPanel("Whitelist", DTOutput('whitelist'), actionButton("add_patient_btn", "New patient")),
+                  tabPanel("ACCEPT calculator",h1("Todo")),
+                  tabPanel("Physicians",DTOutput('physicians'), actionButton("add_physician_btn", "New physician"))
       )),
   ),
+
 
   server = function(input, output, session)
   {
     GetData <- function()
     {
-      whitelistVars <- c('phn','firstName','lastName','whitelisted')
+      whitelistVars <- c('dtScheduled', 'phn','firstName','lastName','whitelisted')
 
       clinicDay <- GetPatients()
       whitelist <- clinicDay[which(clinicDay$whitelisted==T),whitelistVars]
 
-      list(clinicDay=clinicDay, whitelist=whitelist)
+      physicians <- GetPhysicians()
+
+      list(clinicDay=clinicDay, whitelist=whitelist, physicians=physicians)
     }
 
 
     tmp <- GetData()
     dfClinicDay <- tmp$clinicDay
     dfWhitelist <- tmp$whitelist
+    dfPhysicians <- tmp$physicians
 
     options(DT.options = list(pageLength = 5))
 
     # server-side processing
     output$whitelist = render_dt(dfWhitelist, 'cell')
     output$clinicDay = render_dt(dfClinicDay, 'cell')
+    output$physicians <- render_dt(tmp$physicians, 'cell')
 
     # edit a single cell
     observeEvent(input$clinicDay_cell_edit, {
@@ -87,8 +92,8 @@ shinyApp(
     })
 
     #whitelistProxy = dataTableProxy('whiteList')
-    observeEvent(input$add_btn, {
-      AddPatient(data.frame(phn="123456789", source="CRC",  whitelisted=T))
+    observeEvent(input$add_patient_btn, {
+      AddPatient(data.frame(phn="0123456789", source="CRC", dtScheduled=as.character(Sys.Date()+1), whitelisted=T))
       tmp <- GetData()
       dfWhitelist <- tmp$whitelist
       output$whitelist = render_dt(dfWhitelist, 'cell')
@@ -138,8 +143,56 @@ shinyApp(
       output$clinicDay = render_dt(dfClinicDay, 'cell')
       output$whitelist = render_dt(dfWhitelist, 'cell')
     })
+
+
+##Physicians
+    observeEvent(input$add_physician_btn, {
+      AddPhysician(data.frame(userName="janedoe", source="Manager"))
+      tmp <- GetData()
+      dfPhysicians <- tmp$physicians
+      output$physicians = render_dt(dfPhysicians, 'cell')
+    })
+
+
+    observeEvent(input$physicians_cell_edit, {
+      info = input$physicians_cell_edit
+      str(info)  # check what info looks like (a data frame of 3 columns)
+      n_changes <- dim(info)[1]
+      tmp <- GetData()
+      dfPhysicians <- tmp$physicians
+      for(i in 1:n_changes)
+      {
+        userName <- dfPhysicians[info$row[i],'userName']
+        cell_name <- colnames(dfPhysicians)[info$col[i]]
+        cell_value <- info$value
+        if(cell_name=="userName")
+        {
+          if(nchar(cell_value)==0)
+          {
+            DeletePhysician(userName)
+          }
+          {
+            UpdateUserName(userName,cell_value)
+          }
+        }
+        else
+        {
+          dc <- data.frame(userName=userName)
+          dc[cell_name] <- cell_value
+          UpdatePhysician(dc)
+        }
+      }
+      tmp <- GetData()
+      dfPhysicians <- tmp$physicians
+      output$physicains = render_dt(dfPhysicians, 'cell')
+    })
+
+
+
   }
 )
+
+
 
 
 
