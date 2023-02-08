@@ -2,10 +2,10 @@
 % Please edit documentation in R/patients.R
 \name{FindPatient}
 \alias{FindPatient}
-\title{Matches by EVERY thing. If you want by PHN submit a patient with only PHN}
+\title{Matches by EVERY thing. If you want by Code submit a patient with only Code}
 \usage{
 FindPatient(patient, tolerance = 0)
 }
 \description{
-Matches by EVERY thing. If you want by PHN submit a patient with only PHN
+Matches by EVERY thing. If you want by Code submit a patient with only Code
 }

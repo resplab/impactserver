@@ -1,5 +1,3 @@
-
-
 library(shiny)
 library(DT)
 library(storr)
@@ -9,7 +7,7 @@ library(impactserver)
 
 
 render_dt = function(data, editable = 'cell', server = TRUE, ...) {
-  renderDT(data, selection = 'none', server = server, editable = editable, ...)
+  renderDT(data, selection = 'none', server = server, editable = editable, options=list("pageLength" = 100), ...)
 }
 
 
@@ -32,12 +30,12 @@ shinyApp(
   {
     GetData <- function()
     {
-      whitelistVars <- c('dtScheduled', 'phn','firstName','lastName','whitelisted')
+      whitelistVars <- c('dtScheduled', 'code','firstName','lastName','whitelisted')
 
       clinicDay <- GetPatients()
       whitelist <- clinicDay[which(clinicDay$whitelisted==T),whitelistVars]
 
-      physicians <- GetPhysicians()
+      physicians <- GetUsers()
 
       list(clinicDay=clinicDay, whitelist=whitelist, physicians=physicians)
     }
@@ -64,22 +62,22 @@ shinyApp(
       dfClinicDay <- tmp$clinicDay
       for(i in 1:n_changes)
       {
-        phn <- dfClinicDay[info$row[i],'phn']
+        code <- dfClinicDay[info$row[i],'code']
         cell_name <- colnames(dfClinicDay)[info$col[i]]
         cell_value <- info$value
-        if(cell_name=="phn")
+        if(cell_name=="code")
         {
           if(nchar(cell_value)==0)
           {
-            DeletePatient(phn)
+            DeletePatient(code)
           }
           {
-            UpdatePHN(phn,cell_value)
+            UpdateCode(code,cell_value)
           }
         }
         else
         {
-          pt <- data.frame(phn=phn)
+          pt <- data.frame(code=code)
           pt[cell_name] <- cell_value
           UpdatePatient(pt)
         }
@@ -93,7 +91,7 @@ shinyApp(
 
     #whitelistProxy = dataTableProxy('whiteList')
     observeEvent(input$add_patient_btn, {
-      AddPatient(data.frame(phn="0123456789", source="CRC", dtScheduled=as.character(Sys.Date()+1), whitelisted=T))
+      AddPatient(data.frame(code="0123456789", source="CRC", dtScheduled=as.character(Sys.Date()+1), whitelisted=T))
       tmp <- GetData()
       dfWhitelist <- tmp$whitelist
       output$whitelist = render_dt(dfWhitelist, 'cell')
@@ -108,22 +106,22 @@ shinyApp(
       dfWhitelist <- tmp$whitelist
       for(i in 1:n_changes)
       {
-        phn <- dfWhitelist[info$row[i],'phn']
+        code <- dfWhitelist[info$row[i],'code']
         cell_name <- colnames(dfWhitelist)[info$col[i]]
         cell_value <- info$value
-        if(cell_name=="phn")
+        if(cell_name=="code")
         {
           if(nchar(cell_value)==0)
           {
-            DeletePatient(phn)
+            DeletePatient(code)
           }
           {
-            UpdatePHN(phn,cell_value)
+            UpdateCode(code,cell_value)
           }
         }
         else
         {
-          pt <- data.frame(phn=phn)
+          pt <- data.frame(code=code)
           pt[cell_name] <- cell_value
           UpdatePatient(pt)
         }
@@ -147,7 +145,7 @@ shinyApp(
 
 ##Physicians
     observeEvent(input$add_physician_btn, {
-      AddPhysician(data.frame(userName="janedoe", source="Manager"))
+      AddUser(data.frame(userName="janedoe", source="Manager"))
       tmp <- GetData()
       dfPhysicians <- tmp$physicians
       output$physicians = render_dt(dfPhysicians, 'cell')
@@ -179,7 +177,7 @@ shinyApp(
         {
           dc <- data.frame(userName=userName)
           dc[cell_name] <- cell_value
-          UpdatePhysician(dc)
+          UpdateUser(dc)
         }
       }
       tmp <- GetData()

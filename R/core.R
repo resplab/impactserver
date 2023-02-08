@@ -5,7 +5,7 @@
 #' @export
 GetVersionNote <- function()
 {
-  "Rainy evening (2023.01.21)"
+  "Fine dinner (2023.02.07)"
 }
 
 
@@ -31,7 +31,7 @@ Connect <- function(db, fileSystem=T)
   {
     basePath <- unname(ifelse(Sys.info()["sysname"]=="Linux", "/var/lib/impactserver/storr/" ,"C:/Users/msafavi/test/storr/settings/"))
     path <- paste0(basePath,db)
-    st <- storr_rds(path=paste0("c:\\users\\msafavi\\test\\storr\\",db))
+    st <- storr_rds(path=paste0("c:\\IMPACTDB\\",db))
   }
 }
 

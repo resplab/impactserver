@@ -7,7 +7,7 @@ templatePatient <- data.frame( dtAdded=timeStamp(),
                                dtScheduled=timeStamp(),
                                source="", #CRC, PFT, Assistant. The only one that is ignored in the update
                                status="", #Custom to be coded by study personnel as needed
-                               phn="1234567890",
+                               code="1234567890",
                                firstName="Mohsen",
                                lastName="Sadatsafavi",
                                dob="1976-04-28",
@@ -18,7 +18,7 @@ templatePatient <- data.frame( dtAdded=timeStamp(),
                                approachable=0,
                                physician="",
                                machine="",
-                               acceptData=""
+                               data="{}"
 )
 
 
@@ -58,7 +58,7 @@ AddPatient <- function(patient)
 {
   success <- F
 
-  if(length(patient$phn)==0) return(F)
+  if(length(patient$code)==0) return(F)
 
   st <- Connect("patients")
 
@@ -72,9 +72,9 @@ AddPatient <- function(patient)
   }
   index <- dim(df)[1]+1
 
-  phn <- patient$phn
+  code <- patient$code
 
-  if(length(which(df[,'phn']==phn))==0)
+  if(length(which(df[,'code']==code))==0)
   {
     patient$dtAdded <- patient$dtActed <- timeStamp()
     for(element in names(patient))
@@ -96,7 +96,7 @@ AddPatient <- function(patient)
 
 
 
-#Key is PHN. Throws error if patient is not there.
+#Key is Code. Throws error if patient is not there.
 #Patchy updating is acceptable. ONE PATIENT AT A TIME
 #Does not create new patient
 #' @export
@@ -114,7 +114,7 @@ UpdatePatient <- function(patient)
 
   for(i in 1:dim(df)[1])
   {
-    if(df[i,'phn']==patient$phn)
+    if(df[i,'code']==patient$code)
     {
       success <- T
       for(element in names(patient))
@@ -135,9 +135,9 @@ UpdatePatient <- function(patient)
 
 
 #' @export
-AddUpdatePatient <- function(patient)
+UpdateAddPatient <- function(patient)
 {
-  pt <- FindPatient(list(phn=patient$phn))
+  pt <- FindPatient(list(code=patient$code))
   if(length(pt)>0)
   {
     UpdatePatient(patient)
@@ -155,10 +155,39 @@ AddUpdatePatient <- function(patient)
 
 
 
+#' @export
+GetPatient <- function(code, tolerance=0)
+{
+  st <- Connect("patients")
+
+  if(!st$exists("patients"))
+  {
+    return((list()))
+  }
+
+  df <- st$get("patients")
+
+  if(dim(df)[1]==0)
+  {
+    return((list()))
+  }
+
+  i <- which(df$code==code)
+  df[i,'seen'] <- 1
+  df[i,'dtActed'] <- timeStamp()
+  st$set("patients", df)
+
+  Disconnect()
+
+  return(df[i,])
+}
 
 
 
-#' Matches by EVERY thing. If you want by PHN submit a patient with only PHN
+
+
+
+#' Matches by EVERY thing. If you want by Code submit a patient with only Code
 #' @export
 FindPatient <- function(patient, tolerance=0)
 {
@@ -220,7 +249,7 @@ FindPatient <- function(patient, tolerance=0)
 
 
 #' @export
-UpdatePHN <- function(oldPhn, newPhn)
+UpdateCode <- function(oldCode, newCode)
 {
   success <- F
 
@@ -231,13 +260,13 @@ UpdatePHN <- function(oldPhn, newPhn)
   }
 
   df <- st$get("patients")
-  index <- which(df$phn==oldPhn)
+  index <- which(df$code==oldCode)
   if(length(index)>0)
   {
-    index2 <- which(df$phn==newPhn)
+    index2 <- which(df$code==newCode)
     if(length(index2)==0)
     {
-      df[index,'phn'] <- newPhn
+      df[index,'code'] <- newCode
       df[index,'dtActed'] <- timeStamp()
       st$set("patients",df)
       success = T
@@ -252,7 +281,7 @@ UpdatePHN <- function(oldPhn, newPhn)
 
 
 #' @export
-DeletePatient <- function(phn)
+DeletePatient <- function(code)
 {
   success <- F
 
@@ -264,7 +293,7 @@ DeletePatient <- function(phn)
   }
 
   df <- st$get("patients")
-  index <- which(df$phn==phn)
+  index <- which(df$code==code)
   if(length(index)>0)
   {
     df <- df[-index,]
