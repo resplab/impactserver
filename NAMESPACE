@@ -3,7 +3,6 @@
 export(AddPatient)
 export(AddUpdateUser)
 export(AddUser)
-export(Connect)
 export(DeletePatient)
 export(DeleteUser)
 export(Disconnect)
