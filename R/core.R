@@ -5,7 +5,7 @@
 #' @export
 GetVersionNote <- function()
 {
-  "Fine dinner (2023.02.07)"
+  "Long Night (2023.02.08)"
 }
 
 
