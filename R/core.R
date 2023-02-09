@@ -12,7 +12,7 @@ GetVersionNote <- function()
 globalVars <- new.env()
 
 
-#' @export
+
 Connect <- function(db, fileSystem=T)
 {
   require(storr)
