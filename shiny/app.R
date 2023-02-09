@@ -167,7 +167,7 @@ shinyApp(
         {
           if(nchar(cell_value)==0)
           {
-            DeletePhysician(userName)
+            DeleteUser(userName)
           }
           {
             UpdateUserName(userName,cell_value)
