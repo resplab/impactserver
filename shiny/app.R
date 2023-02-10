@@ -22,7 +22,7 @@ shinyApp(
                   tabPanel("Whitelist", DTOutput('whitelist'), actionButton("add_patient_btn", "New patient")),
                   tabPanel("ACCEPT calculator",h1("Todo")),
                   tabPanel("Physicians",DTOutput('physicians'), actionButton("add_physician_btn", "New physician"))
-      )),
+      )),print(paste("Server version:",GetVersionNote()))
   ),
 
 
