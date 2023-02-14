@@ -189,7 +189,7 @@ GetPatient <- function(code, tolerance=0)
 
 #' Matches by EVERY thing. If you want by Code submit a patient with only Code
 #' @export
-FindPatient <- function(patient, tolerance=0)
+FindPatient <- function(patient, tolerance=1)
 {
   st <- Connect("patients")
 
@@ -219,9 +219,23 @@ FindPatient <- function(patient, tolerance=0)
         }
         else
         {
-          if(patient[[element]]!=df[i,element])
+          if(element=='code' && tolerance>0)
           {
-            success <- F
+            if(gsub("0","9",patient[[element]])==gsub("0","9",df[i,element]))
+            {
+              success <- T
+            }
+            else
+            {
+              success <- F
+            }
+          }
+          else
+          {
+            if(patient[[element]]!=df[i,element])
+            {
+              success <- F
+            }
           }
         }
       }

@@ -5,7 +5,7 @@
 #' @export
 GetVersionNote <- function()
 {
-  "2023.02.09 (Portwait day)"
+  "2023.02.13 (Sunshine Varadero)"
 }
 
 
