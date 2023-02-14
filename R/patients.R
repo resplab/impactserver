@@ -156,7 +156,7 @@ UpdateAddPatient <- function(patient)
 
 
 #' @export
-GetPatient <- function(code, tolerance=0)
+GetPatient <- function(code, tolerance=1)
 {
   st <- Connect("patients")
 
@@ -172,7 +172,16 @@ GetPatient <- function(code, tolerance=0)
     return((list()))
   }
 
-  i <- which(df$code==code)
+  if(tolerance>0)
+  {
+    i <- which(gsub("0","9",df$code)==gsub("0","9",code))
+    if(length(i)>1) i <- i[1]
+  }
+  else
+  {
+    i <- which(df$code==code)
+  }
+
   df[i,'seen'] <- 1
   df[i,'dtActed'] <- timeStamp()
   st$set("patients", df)
