@@ -22,7 +22,7 @@ shinyApp(
                   tabPanel("Whitelist", DTOutput('whitelist'), actionButton("add_patient_btn", "New patient")),
                   tabPanel("ACCEPT calculator",h1("Todo")),
                   tabPanel("Physicians",DTOutput('physicians'), actionButton("add_physician_btn", "New physician")),
-                  tabPanel("Log",DTOutput('log'), h1("ToDo"))
+                  tabPanel("Logs",DTOutput('logs'), actionButton("flush_logs_btn", "Delete logs"))
       )),print(paste("Server version:",GetVersionNote()))
   ),
 
@@ -33,10 +33,10 @@ shinyApp(
     {
       whitelistVars <- c('dtScheduled', 'code','firstName','lastName','whitelisted')
 
-      clinicDay <- GetPatients()
+      clinicDay <- impactserver:::GetPatients()
       whitelist <- clinicDay[which(clinicDay$whitelisted==T),whitelistVars]
 
-      physicians <- GetUsers()
+      physicians <- impactserver:::GetUsers()
 
       list(clinicDay=clinicDay, whitelist=whitelist, physicians=physicians)
     }
@@ -47,13 +47,13 @@ shinyApp(
     dfWhitelist <- tmp$whitelist
     dfPhysicians <- tmp$physicians
 
-
     options(DT.options = list(pageLength = 5))
 
     # server-side processing
     output$whitelist = render_dt(dfWhitelist, 'cell')
     output$clinicDay = render_dt(dfClinicDay, 'cell')
-    output$physicians <- render_dt(tmp$physicians, 'cell')
+    output$physicians <- render_dt(dfPhysicians, 'cell')
+    output$logs <- render_dt(impactserver:::GetLogs(), 'none')
 
     # edit a single cell
     observeEvent(input$clinicDay_cell_edit, {
@@ -187,7 +187,10 @@ shinyApp(
       output$physicains = render_dt(dfPhysicians, 'cell')
     })
 
-
+#Logs
+    observeEvent(input$flush_logs_btn, {
+      FlushLogs()
+    })
 
   }
 )

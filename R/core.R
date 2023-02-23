@@ -5,7 +5,7 @@
 #' @export
 GetVersionNote <- function()
 {
-  "2023.02.22 (User Producer)"
+  "2023.02.22 (Gate Keeper)"
 }
 
 
@@ -30,11 +30,11 @@ Connect <- function(db, fileSystem=T)
   }
   else
   {
-    basePath <- unname(ifelse(Sys.info()["sysname"]=="Linux", "/var/lib/impactserver/storr/" ,"C:/Users/msafavi/test/storr/settings/"))
-    path <- paste0(basePath,db)
     st <- storr_rds(path=paste0("c:\\IMPACTDB\\",db))
   }
 }
+
+
 
 
 #' @export
@@ -60,65 +60,16 @@ timeStamp <- function()
 
 
 #' @export
-Set <- function(val1,val2) {
-  st <- Connect("settings")
-  st$set(val1,val2)
-  Disconnect()
-}
-
-
-#' @export
-Get <- function(val1) {
-  st <- Connect("settings")
-  st$get(val1)
-  Disconnect()
-}
-
-
-
-
-#' @export
-SaveSettings <- function(user,settingVars) {
-  st <- Connect("settings")
-  st$set(paste0("user.",user),settingVars)
-  Disconnect()
-  return(T)
-}
-
-
-
-#' @export
-LoadSettings <- function(user) {
-  st <- Connect("settings")
-  out <- NULL
-  if(st$exists(paste0("user.",user)))
+Gateway <- function(accessKey, userName, func, parms)
+{
+  if(accessKey %in% c("0123456789"))
   {
-    out <- st$get(paste0("user.",user))
+    try(AddLog(source=userName, event=func, logData=parms) , silent = T)
+    return(do.call(func, parms))
   }
   else
   {
-    out <- NULL
+    return(NULL)
   }
-
-  Disconnect()
-  out
 }
-
-
-
-#' @export
-FlushSettings <- function()
-{
-  require(storr)
-  st <- Connect("settings")
-  st$destroy()
-}
-
-
-
-
-
-
-
-
 

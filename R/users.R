@@ -19,7 +19,6 @@ templateUser <- data.frame(
 
 
 
-#' @export
 GetTemplateUser <- function()
 {
   templateUser
@@ -27,7 +26,7 @@ GetTemplateUser <- function()
 
 
 
-#' @export
+
 GetUsers <- function()
 {
   st <- Connect("users")
@@ -49,7 +48,6 @@ GetUsers <- function()
 
 
 # Patchy adding is accepted. DOES NOT CHECK for duplicates
-#' @export
 AddUser <- function(user)
 {
   success <- F
@@ -93,7 +91,6 @@ AddUser <- function(user)
 #Key is userName. Throws error if user is not there.
 #Patchy updating is acceptable. ONE RECORD AT A TIME
 #Does not create new physicain
-#' @export
 UpdateUser <- function(user)
 {
   success <- F
@@ -128,7 +125,6 @@ UpdateUser <- function(user)
 
 
 
-#' @export
 AddUpdateUser <- function(user)
 {
   pt <- FindUser(list(userName=user$userName))
@@ -153,7 +149,6 @@ AddUpdateUser <- function(user)
 
 
 
-#' @export
 GetUser <- function(userName, tolerance=0)
 {
   st <- Connect("users")
@@ -181,9 +176,9 @@ GetUser <- function(userName, tolerance=0)
     {
       newUser <- GetTemplateUser()
       newUser$userName <- userName
-      newUser$firstName <- "Dr."
-      newUser$lastName <- "Respirologist!"
-      newUser$role <- "pilot"
+      newUser$firstName <- "Unknown"
+      newUser$lastName <- "Unknown"
+      newUser$contribution <- "pilot"
       newUser$source="Server"
       AddUser(newUser)
       res <- newUser
@@ -203,7 +198,6 @@ GetUser <- function(userName, tolerance=0)
 
 
 
-#' @export
 UpdateUserName <- function(oldUserName, newUserName)
 {
   success <- F
@@ -236,7 +230,6 @@ UpdateUserName <- function(oldUserName, newUserName)
 
 
 
-#' @export
 DeleteUser <- function(userName)
 {
   success <- F
@@ -265,7 +258,6 @@ DeleteUser <- function(userName)
 
 
 
-#' @export
 FlushUsers <- function()
 {
   st <- Connect("users")

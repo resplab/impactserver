@@ -24,14 +24,12 @@ templatePatient <- data.frame( dtAdded=timeStamp(),
 
 
 
-#' @export
 GetTemplatePatient <- function()
 {
   templatePatient
 }
 
 
-#' @export
 GetPatients <- function()
 {
   st <- Connect("patients")
@@ -53,7 +51,6 @@ GetPatients <- function()
 
 
 # Patchy adding is accepted. DOES NOT CHECK for duplicates
-#' @export
 AddPatient <- function(patient)
 {
   success <- F
@@ -99,7 +96,6 @@ AddPatient <- function(patient)
 #Key is Code. Throws error if patient is not there.
 #Patchy updating is acceptable. ONE PATIENT AT A TIME
 #Does not create new patient
-#' @export
 UpdatePatient <- function(patient)
 {
   success <- F
@@ -134,7 +130,6 @@ UpdatePatient <- function(patient)
 
 
 
-#' @export
 UpdateAddPatient <- function(patient)
 {
   pt <- FindPatient(list(code=patient$code))
@@ -155,7 +150,6 @@ UpdateAddPatient <- function(patient)
 
 
 
-#' @export
 GetPatient <- function(code, tolerance=1)
 {
   st <- Connect("patients")
@@ -197,7 +191,6 @@ GetPatient <- function(code, tolerance=1)
 
 
 #' Matches by EVERY thing. If you want by Code submit a patient with only Code
-#' @export
 FindPatient <- function(patient, tolerance=1)
 {
   st <- Connect("patients")
@@ -272,7 +265,6 @@ FindPatient <- function(patient, tolerance=1)
 
 
 
-#' @export
 UpdateCode <- function(oldCode, newCode)
 {
   success <- F
@@ -304,7 +296,6 @@ UpdateCode <- function(oldCode, newCode)
 
 
 
-#' @export
 DeletePatient <- function(code)
 {
   success <- F
@@ -333,7 +324,6 @@ DeletePatient <- function(code)
 
 
 
-#' @export
 FlushPatients <- function()
 {
   st <- Connect("patients")

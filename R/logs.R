@@ -1,11 +1,10 @@
 templateLog <- data.frame(
   dt=timeStamp(),
   event="",
-  data="[]"
+  logData="[]"
 )
 
 
-#' @export
 GetTemplateLog <- function()
 {
   templateLog
@@ -14,23 +13,11 @@ GetTemplateLog <- function()
 
 
 
-#' @export
 GetLogs <- function()
 {
-  st <- Connect("logs")
+  try({y <- read.table(file="c:\\IMPACTDB\\logs\\impactserver.txt", sep = "|"); return(as.data.frame(y))},silent = T)
 
-  if(st$exists("logs"))
-  {
-    df <- st$get("logs")
-  }
-  else
-  {
-    df <- templateLog[-1,]
-  }
-
-  Disconnect()
-
-  df
+  return(data.frame())
 }
 
 
@@ -38,42 +25,28 @@ GetLogs <- function()
 
 
 
-#' @export
 AddLog <- function(dt=timeStamp(), source, event, logData=list())
 {
-  success <- F
-
-  st <- Connect("logs")
-
-  if(st$exists("logs"))
-  {
-    df <- st$get("logs")
-  }
-  else
-  {
-    df <- GetTemplateLog()[-1,]
-  }
-
-  index <- dim(df)[1]+1
-
-  df[index,'dt']<-dt
-  df[index,'source']<-source
-  df[index,'event']<-event
+  x <- data.frame(dt=dt, source=source, event=event)
 
   if(length(logData)>0)
   {
     require(jsonlite)
-    df[index,'logData']<-toJSON(logData)
+    x$logData<-toJSON(logData)
   }
   else
   {
-    df[index,'logData']<-"[]"
+    x$logData<-"[]"
   }
 
-
-  st$set("logs",df)
-
-  Disconnect()
+  write.table(x, file="c:\\IMPACTDB\\logs\\impactserver.txt", append = T, row.names = F, col.names = F, sep = "|")
 
   T
+}
+
+
+
+FlushLogs <- function()
+{
+  try({file.remove("c:\\IMPACTDB\\logs\\impactserver.txt")},silent = T)
 }
