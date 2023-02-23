@@ -5,11 +5,12 @@
 #' @export
 GetVersionNote <- function()
 {
-  "2023.02.13 (Sunshine week)"
+  "2023.02.22 (User Producer)"
 }
 
 
 globalVars <- new.env()
+globalVars$createUserWhenNotFound<-T
 
 
 

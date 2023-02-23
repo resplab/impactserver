@@ -4,7 +4,7 @@
 \alias{FindPatient}
 \title{Matches by EVERY thing. If you want by Code submit a patient with only Code}
 \usage{
-FindPatient(patient, tolerance = 0)
+FindPatient(patient, tolerance = 1)
 }
 \description{
 Matches by EVERY thing. If you want by Code submit a patient with only Code

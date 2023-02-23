@@ -21,7 +21,8 @@ shinyApp(
                   tabPanel("Clinic day", selectInput("clinicDayDateSelector","Which day",c(Sys.Date()-1,Sys.Date(),Sys.Date()+1)),  DTOutput('clinicDay'), actionButton("refresh_btn","Refresh")),
                   tabPanel("Whitelist", DTOutput('whitelist'), actionButton("add_patient_btn", "New patient")),
                   tabPanel("ACCEPT calculator",h1("Todo")),
-                  tabPanel("Physicians",DTOutput('physicians'), actionButton("add_physician_btn", "New physician"))
+                  tabPanel("Physicians",DTOutput('physicians'), actionButton("add_physician_btn", "New physician")),
+                  tabPanel("Log",DTOutput('log'), h1("ToDo"))
       )),print(paste("Server version:",GetVersionNote()))
   ),
 
@@ -45,6 +46,7 @@ shinyApp(
     dfClinicDay <- tmp$clinicDay
     dfWhitelist <- tmp$whitelist
     dfPhysicians <- tmp$physicians
+
 
     options(DT.options = list(pageLength = 5))
 

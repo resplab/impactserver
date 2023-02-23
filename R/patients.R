@@ -254,6 +254,7 @@ FindPatient <- function(patient, tolerance=1)
       df[i,'seen'] <- 1
       df[i,'dtActed'] <- timeStamp()
       st$set("patients", df)
+
       return(df[i,])
     }
   }

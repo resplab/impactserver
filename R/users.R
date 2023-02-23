@@ -1,6 +1,7 @@
 
 
-templateUser <- data.frame(dtAdded=timeStamp(),
+templateUser <- data.frame(
+                               dtAdded=timeStamp(),
                                dtActed=timeStamp(), #Last datetime they logged in
                                dtInteracted=timeStamp(),
                                source="", #Manager or Assistant. The only filed that is ignored in the update
@@ -164,12 +165,34 @@ GetUser <- function(userName, tolerance=0)
 
   df <- st$get("users")
 
+
   if(dim(df)[1]==0)
   {
-    return((list()))
+    res <- GetTemplateUser()[-1,]
+  }
+  else
+  {
+    res <- df[which(df$userName==userName),]
   }
 
-  return(df[which(df$userName==userName),])
+  if(dim(res)[1]==0)
+  {
+    if(globalVars$createUserWhenNotFound)
+    {
+      newUser <- GetTemplateUser()
+      newUser$userName <- userName
+      newUser$firstName <- "Dr."
+      newUser$lastName <- "Respirologist!"
+      newUser$role <- "pilot"
+      newUser$source="Server"
+      AddUser(newUser)
+      res <- newUser
+    }
+  }
+
+  #try(AddLog(source="Server", event="FindUser", logData=list(userName=userName)), silent=T)
+
+  return(res)
 }
 
 
