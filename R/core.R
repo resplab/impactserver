@@ -5,7 +5,7 @@
 #' @export
 GetVersionNote <- function()
 {
-  "2023.02.22 (Gate Keeper)"
+  "2023.02.23 (Gate Keeper)"
 }
 
 
