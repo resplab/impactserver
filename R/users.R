@@ -3,16 +3,13 @@
 templateUser <- data.frame(
                                dtAdded=timeStamp(),
                                dtActed=timeStamp(), #Last datetime they logged in
-                               dtInteracted=timeStamp(),
+                               dtInteracted="",
                                source="", #Manager or Assistant. The only filed that is ignored in the update
                                status="", #Custom to be coded by study personnel as needed
-                               userName="dsin",
-                               firstName="Don",
-                               lastName="Sin",
+                               userName="johndoe",
+                               firstName="John",
+                               lastName="Doe",
                                contribution="Pilot",
-                               seen=0,
-                               assistantUsed=0,
-                               machine="", #Last machine they signed on
                                settingVars="{}"
 )
 
@@ -178,7 +175,7 @@ GetUser <- function(userName, tolerance=0)
       newUser$userName <- userName
       newUser$firstName <- "Unknown"
       newUser$lastName <- "Unknown"
-      newUser$contribution <- "pilot"
+      newUser$contribution <- "default"
       newUser$source="Server"
       AddUser(newUser)
       res <- newUser

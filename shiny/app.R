@@ -18,11 +18,11 @@ shinyApp(
     mainPanel(
       headerPanel("IMPACT study coordinator centre"),
       tabsetPanel(type = "tabs",
-                  tabPanel("Clinic day", selectInput("clinicDayDateSelector","Which day",c(Sys.Date()-1,Sys.Date(),Sys.Date()+1)),  DTOutput('clinicDay'), actionButton("refresh_btn","Refresh")),
+                  tabPanel("Clinic day", selectInput("clinicDayDateSelector","Which day",c(Sys.Date()-1,Sys.Date(),Sys.Date()+1)),  DTOutput('clinicDay'), actionButton("clinicDay_refresh_btn","Refresh")),
                   tabPanel("Whitelist", DTOutput('whitelist'), actionButton("add_patient_btn", "New patient")),
                   tabPanel("ACCEPT calculator",h1("Todo")),
-                  tabPanel("Physicians",DTOutput('physicians'), actionButton("add_physician_btn", "New physician")),
-                  tabPanel("Logs",DTOutput('logs'), actionButton("flush_logs_btn", "Delete logs"))
+                  tabPanel("Physicians",DTOutput('physicians'), actionButton("add_physician_btn", "New physician"), actionButton("physicians_refresh_btn","Refresh")),
+                  tabPanel("Logs",DTOutput('logs'), actionButton("flush_logs_btn", "Delete logs"), actionButton("logs_refresh_btn","Refresh"))
       )),print(paste("Server version:",GetVersionNote()))
   ),
 
@@ -52,8 +52,8 @@ shinyApp(
     # server-side processing
     output$whitelist = render_dt(dfWhitelist, 'cell')
     output$clinicDay = render_dt(dfClinicDay, 'cell')
-    output$physicians <- render_dt(dfPhysicians, 'cell')
-    output$logs <- render_dt(impactserver:::GetLogs(), 'none')
+    output$physicians = render_dt(dfPhysicians, 'cell')
+    output$logs = render_dt(impactserver:::GetLogs(), 'none')
 
     # edit a single cell
     observeEvent(input$clinicDay_cell_edit, {
@@ -71,19 +71,20 @@ shinyApp(
         {
           if(nchar(cell_value)==0)
           {
-            DeletePatient(code)
+            impactserver:::DeletePatient(code)
           }
           {
-            UpdateCode(code,cell_value)
+            impactserver:::UpdateCode(code,cell_value)
           }
         }
         else
         {
           pt <- data.frame(code=code)
           pt[cell_name] <- cell_value
-          UpdatePatient(pt)
+          impactserver:::UpdatePatient(pt)
         }
       }
+
       tmp <- GetData()
       dfClinicDay <- tmp$clinicDay
       dfWhitelist <- tmp$whitelist
@@ -93,7 +94,7 @@ shinyApp(
 
     #whitelistProxy = dataTableProxy('whiteList')
     observeEvent(input$add_patient_btn, {
-      AddPatient(data.frame(code="0123456789", source="CRC", dtScheduled=as.character(Sys.Date()+1), whitelisted=T))
+      impactserver:::AddPatient(data.frame(code="0123456789", source="CRC", dtScheduled=as.character(Sys.Date()+1), whitelisted=T))
       tmp <- GetData()
       dfWhitelist <- tmp$whitelist
       output$whitelist = render_dt(dfWhitelist, 'cell')
@@ -115,17 +116,17 @@ shinyApp(
         {
           if(nchar(cell_value)==0)
           {
-            DeletePatient(code)
+            impactserver:::DeletePatient(code)
           }
           {
-            UpdateCode(code,cell_value)
+            impactserver:::UpdateCode(code,cell_value)
           }
         }
         else
         {
           pt <- data.frame(code=code)
           pt[cell_name] <- cell_value
-          UpdatePatient(pt)
+          impactserver:::UpdatePatient(pt)
         }
       }
       tmp <- GetData()
@@ -136,7 +137,7 @@ shinyApp(
     })
 
 
-    observeEvent(input$refresh_btn, {
+    observeEvent(input$clinicDay_refresh_btn, {
       tmp <- GetData()
       dfClinicDay <- tmp$clinicDay
       dfWhitelist <- tmp$whitelist
@@ -147,14 +148,15 @@ shinyApp(
 
 ##Physicians
     observeEvent(input$add_physician_btn, {
-      AddUser(data.frame(userName="janedoe", source="Manager"))
+      impactserver:::AddUser(data.frame(userName="janedoe", source="Manager"))
       tmp <- GetData()
       dfPhysicians <- tmp$physicians
       output$physicians = render_dt(dfPhysicians, 'cell')
     })
 
 
-    observeEvent(input$physicians_cell_edit, {
+    observeEvent(input$physicians_cell_edit,
+    {
       info = input$physicians_cell_edit
       str(info)  # check what info looks like (a data frame of 3 columns)
       n_changes <- dim(info)[1]
@@ -169,27 +171,38 @@ shinyApp(
         {
           if(nchar(cell_value)==0)
           {
-            DeleteUser(userName)
+            impactserver:::DeleteUser(userName)
           }
           {
-            UpdateUserName(userName,cell_value)
+            impactserver:::UpdateUserName(userName,cell_value)
           }
         }
         else
         {
           dc <- data.frame(userName=userName)
           dc[cell_name] <- cell_value
-          UpdateUser(dc)
+          impactserver:::UpdateUser(dc)
         }
       }
       tmp <- GetData()
       dfPhysicians <- tmp$physicians
-      output$physicains = render_dt(dfPhysicians, 'cell')
+      output$physicians = render_dt(dfPhysicians, 'cell')
+    })
+
+    observeEvent(input$physicians_refresh_btn, {
+      tmp <- GetData()
+      dfPhysicians <- tmp$physicians
+      output$physicians = render_dt(dfPhysicians, 'cell')
     })
 
 #Logs
     observeEvent(input$flush_logs_btn, {
-      FlushLogs()
+      impactserver:::FlushLogs()
+      output$logs = render_dt(impactserver:::GetLogs(), 'none')
+    })
+
+    observeEvent(input$logs_refresh_btn, {
+      output$logs = render_dt(impactserver:::GetLogs(), 'none')
     })
 
   }
