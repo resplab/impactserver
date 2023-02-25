@@ -41,6 +41,17 @@ shinyApp(
       list(clinicDay=clinicDay, whitelist=whitelist, physicians=physicians)
     }
 
+    GetLogs <- function()
+    {
+      out <- impactserver:::GetLogs()
+      if(dim(out)[1]>0)
+      {
+        out <- out[dim(out)[1]:1,]
+      }
+
+      out
+    }
+
 
     tmp <- GetData()
     dfClinicDay <- tmp$clinicDay
@@ -53,7 +64,7 @@ shinyApp(
     output$whitelist = render_dt(dfWhitelist, 'cell')
     output$clinicDay = render_dt(dfClinicDay, 'cell')
     output$physicians = render_dt(dfPhysicians, 'cell')
-    output$logs = render_dt(impactserver:::GetLogs(), 'none')
+    output$logs = render_dt(GetLogs(), 'none')
 
     # edit a single cell
     observeEvent(input$clinicDay_cell_edit, {
@@ -146,7 +157,7 @@ shinyApp(
     })
 
 
-##Physicians
+    ##Physicians
     observeEvent(input$add_physician_btn, {
       impactserver:::AddUser(data.frame(userName="janedoe", source="Manager"))
       tmp <- GetData()
@@ -156,38 +167,38 @@ shinyApp(
 
 
     observeEvent(input$physicians_cell_edit,
-    {
-      info = input$physicians_cell_edit
-      str(info)  # check what info looks like (a data frame of 3 columns)
-      n_changes <- dim(info)[1]
-      tmp <- GetData()
-      dfPhysicians <- tmp$physicians
-      for(i in 1:n_changes)
-      {
-        userName <- dfPhysicians[info$row[i],'userName']
-        cell_name <- colnames(dfPhysicians)[info$col[i]]
-        cell_value <- info$value
-        if(cell_name=="userName")
-        {
-          if(nchar(cell_value)==0)
-          {
-            impactserver:::DeleteUser(userName)
-          }
-          {
-            impactserver:::UpdateUserName(userName,cell_value)
-          }
-        }
-        else
-        {
-          dc <- data.frame(userName=userName)
-          dc[cell_name] <- cell_value
-          impactserver:::UpdateUser(dc)
-        }
-      }
-      tmp <- GetData()
-      dfPhysicians <- tmp$physicians
-      output$physicians = render_dt(dfPhysicians, 'cell')
-    })
+                 {
+                   info = input$physicians_cell_edit
+                   str(info)  # check what info looks like (a data frame of 3 columns)
+                   n_changes <- dim(info)[1]
+                   tmp <- GetData()
+                   dfPhysicians <- tmp$physicians
+                   for(i in 1:n_changes)
+                   {
+                     userName <- dfPhysicians[info$row[i],'userName']
+                     cell_name <- colnames(dfPhysicians)[info$col[i]]
+                     cell_value <- info$value
+                     if(cell_name=="userName")
+                     {
+                       if(nchar(cell_value)==0)
+                       {
+                         impactserver:::DeleteUser(userName)
+                       }
+                       {
+                         impactserver:::UpdateUserName(userName,cell_value)
+                       }
+                     }
+                     else
+                     {
+                       dc <- data.frame(userName=userName)
+                       dc[cell_name] <- cell_value
+                       impactserver:::UpdateUser(dc)
+                     }
+                   }
+                   tmp <- GetData()
+                   dfPhysicians <- tmp$physicians
+                   output$physicians = render_dt(dfPhysicians, 'cell')
+                 })
 
     observeEvent(input$physicians_refresh_btn, {
       tmp <- GetData()
@@ -195,14 +206,14 @@ shinyApp(
       output$physicians = render_dt(dfPhysicians, 'cell')
     })
 
-#Logs
+    #Logs
     observeEvent(input$flush_logs_btn, {
       impactserver:::FlushLogs()
-      output$logs = render_dt(impactserver:::GetLogs(), 'none')
+      output$logs = render_dt(GetLogs(), 'none')
     })
 
     observeEvent(input$logs_refresh_btn, {
-      output$logs = render_dt(impactserver:::GetLogs(), 'none')
+      output$logs = render_dt(GetLogs(), 'none')
     })
 
   }

@@ -37,7 +37,7 @@ Connect <- function(db, fileSystem=T)
 
 
 
-#' @export
+
 Disconnect <- function()
 {
   tryCatch(
@@ -49,8 +49,7 @@ Disconnect <- function()
 
 
 
-#Internal for unviersally formatted datetime
-#' @export
+#Internal for universally formatted datetime
 timeStamp <- function()
 {
   as.character(Sys.time())
