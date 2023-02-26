@@ -22,7 +22,7 @@ shinyApp(
                   tabPanel("Whitelist", DTOutput('whitelist'), actionButton("add_patient_btn", "New patient")),
                   tabPanel("ACCEPT calculator",h1("Todo")),
                   tabPanel("Physicians",DTOutput('physicians'), actionButton("add_physician_btn", "New physician"), actionButton("physicians_refresh_btn","Refresh")),
-                  tabPanel("Logs",DTOutput('logs'), actionButton("flush_logs_btn", "Delete logs"), actionButton("logs_refresh_btn","Refresh"))
+                  tabPanel("Logs", actionButton("logs_refresh_btn","Refresh"), DTOutput('logs'), actionButton("flush_logs_btn", "Delete logs"))
       )),print(paste("Server version:",GetVersionNote()))
   ),
 

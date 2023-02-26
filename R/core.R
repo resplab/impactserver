@@ -5,7 +5,7 @@
 #' @export
 GetVersionNote <- function()
 {
-  "2023.02.23 (Gate Keeper)"
+  "2023.02.25 (User nonabuser)"
 }
 
 
@@ -59,12 +59,13 @@ timeStamp <- function()
 
 
 #' @export
-Gateway <- function(accessKey, userName, func, parms)
+Gateway <- function(accessKey, userName, func, parms, exData=list())
 {
   if(accessKey %in% c("0123456789"))
   {
-    try(AddLog(source=userName, event=func, logData=parms) , silent = T)
-    return(do.call(func, parms))
+    res <- do.call(func, parms)
+    try({require(jsonlite); AddLog(source=userName, event=func, logData=list(inData=parms, exData=exData, outData=res))}, silent = T)
+    return(res)
   }
   else
   {

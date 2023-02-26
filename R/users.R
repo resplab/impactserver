@@ -49,6 +49,8 @@ AddUser <- function(user)
 {
   success <- F
 
+  user$userName <- gsub(" ", "", tolower(user$userName))
+
   st <- Connect("users")
 
   if(st$exists("users"))
@@ -61,7 +63,7 @@ AddUser <- function(user)
   }
   index <- dim(df)[1]+1
 
-   userName <- user$userName
+  userName <- user$userName
 
   if(length(which(df[,'userName']==userName))==0)
   {
@@ -164,7 +166,7 @@ GetUser <- function(userName, tolerance=0)
   }
   else
   {
-    res <- df[which(df$userName==userName),]
+    res <- df[which(tolower(df$userName)==tolower(userName)),]
   }
 
   if(dim(res)[1]==0)
@@ -198,6 +200,8 @@ GetUser <- function(userName, tolerance=0)
 UpdateUserName <- function(oldUserName, newUserName)
 {
   success <- F
+
+  newUserName <- gsub(" ", "", newUserName)
 
   st <- Connect("users")
   if(!st$exists("users"))
