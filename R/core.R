@@ -59,12 +59,12 @@ timeStamp <- function()
 
 
 #' @export
-Gateway <- function(accessKey, userName, func, parms, exData=list())
+Gateway <- function(accessKey, userName, func, parms)
 {
   if(accessKey %in% c("0123456789"))
   {
     res <- do.call(func, parms)
-    try({require(jsonlite); AddLog(source=userName, event=func, logData=list(inData=parms, exData=exData, outData=res))}, silent = T)
+    try({AddLog(source=userName, event=func, logData=list(inData=parms, outData=res))}, silent = T)
     return(res)
   }
   else
