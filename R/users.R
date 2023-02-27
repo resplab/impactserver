@@ -177,7 +177,7 @@ GetUser <- function(userName, tolerance=0)
       newUser$userName <- userName
       newUser$firstName <- "Unknown"
       newUser$lastName <- "Unknown"
-      newUser$contribution <- "default"
+      newUser$contribution <- "pilot"
       newUser$source="Server"
       AddUser(newUser)
       res <- newUser

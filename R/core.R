@@ -5,7 +5,7 @@
 #' @export
 GetVersionNote <- function()
 {
-  "2023.02.25 (User nonabuser)"
+  "2023.02.25 (Snowy days)"
 }
 
 
