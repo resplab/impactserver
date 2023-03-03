@@ -5,13 +5,13 @@
 #' @export
 GetVersionNote <- function()
 {
-  "2023.02.25 (Snowy days)"
+  "2023.03.02 (PArk Royal)"
 }
 
 
 globalVars <- new.env()
 globalVars$createUserWhenNotFound<-T
-
+globalVars$caller <- ""
 
 
 Connect <- function(db, fileSystem=T)
@@ -63,6 +63,7 @@ Gateway <- function(accessKey, userName, func, parms)
 {
   if(accessKey %in% c("0123456789"))
   {
+    globalVars$caller <- userName
     res <- do.call(func, parms)
     try({AddLog(source=userName, event=func, logData=list(inData=parms, outData=res))}, silent = T)
     return(res)

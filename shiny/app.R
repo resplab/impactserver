@@ -31,7 +31,7 @@ shinyApp(
   {
     GetData <- function()
     {
-      whitelistVars <- c('dtScheduled', 'code','firstName','lastName','whitelisted')
+      whitelistVars <- c('dtScheduled', 'code','firstName','lastName', 'physician','whitelisted')
 
       clinicDay <- impactserver:::GetPatients()
       whitelist <- clinicDay[which(clinicDay$whitelisted==T),whitelistVars]
