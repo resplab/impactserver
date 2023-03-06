@@ -5,7 +5,7 @@
 #' @export
 GetVersionNote <- function()
 {
-  "2023.03.02 (PArk Royal)"
+  "2023.03.05 (Park Royal)"
 }
 
 

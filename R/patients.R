@@ -18,6 +18,7 @@ templatePatient <- data.frame( dtAdded=timeStamp(),
                                approachable=0,
                                physician="",
                                machine="",
+                               caller="",
                                data="{}"
 )
 
@@ -74,7 +75,7 @@ AddPatient <- function(patient)
   if(length(which(df[,'code']==code))==0)
   {
     patient$dtAdded <- patient$dtActed <- timeStamp()
-    patient$caller <- globalVars$caller
+    if(nchar(globalVars$caller)>0) patient$caller <- globalVars$caller
     for(element in names(patient))
     {
       if(length(patient[[element]])>0)
@@ -119,7 +120,7 @@ UpdatePatient <- function(patient)
         if(element!="source") df[i, element] <- patient[[element]]
       }
       df[i,'dtActed'] <- timeStamp() #Cant cheat and update this manually so the last item to override
-      df[i,'caller'] <- globalVars$caller
+      if(nchar(globalVars$caller)>0) df[i,'caller'] <- globalVars$caller
     }
     st$set("patients",df)
   }
@@ -180,7 +181,7 @@ GetPatient <- function(code, tolerance=1)
 
   df[i,'seen'] <- 1
   df[i,'dtActed'] <- timeStamp()
-  df[i,'caller'] <- globalVars$caller
+  if(nchar(globalVars$caller)>0) df[i,'caller'] <- globalVars$caller
   st$set("patients", df)
 
   Disconnect()
@@ -248,7 +249,7 @@ FindPatient <- function(patient, tolerance=1)
     if(success)
     {
       df[i,'seen'] <- 1
-      df[i,'caller'] <- globalVars$caller
+      if(nchar(globalVars$caller)>0) df[i,'caller'] <- globalVars$caller
       df[i,'dtActed'] <- timeStamp()
       st$set("patients", df)
 
