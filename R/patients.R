@@ -135,15 +135,20 @@ UpdatePatient <- function(patient)
 
 UpdateAddPatient <- function(patient)
 {
-  pt <- FindPatient(list(code=patient$code))
-  if(length(pt)>0)
+  pt <- GetPatient(patient$code)
+
+  res <- NULL
+
+  if(dim(pt)[1]>0)
   {
-    UpdatePatient(patient)
+    res <- UpdatePatient(patient)
   }
   else
   {
-    AddPatient(patient)
+    res <- AddPatient(patient)
   }
+
+  res
 }
 
 
@@ -194,8 +199,7 @@ GetPatient <- function(code, tolerance=1)
 
 
 
-#' Matches by EVERY thing. If you want by Code submit a patient with only Code
-FindPatient <- function(patient, tolerance=1)
+GetPatientsByPhysician <- function(physician)
 {
   st <- Connect("patients")
 
@@ -212,54 +216,12 @@ FindPatient <- function(patient, tolerance=1)
   }
 
   out <- NULL
-  for(i in 1:dim(df)[1])
-  {
-    success <- T
-    for(element in names(patient))
-    {
-      if(!is.na(patient[[element]]))
-      {
-        if(is.na(df[i,element]))
-        {
-          success <- F
-        }
-        else
-        {
-          if(element=='code' && tolerance>0)
-          {
-            if(gsub("0","9",patient[[element]])==gsub("0","9",df[i,element]))
-            {
-              success <- T
-            }
-            else
-            {
-              success <- F
-            }
-          }
-          else
-          {
-            if(patient[[element]]!=df[i,element])
-            {
-              success <- F
-            }
-          }
-        }
-      }
-    }
-    if(success)
-    {
-      df[i,'seen'] <- 1
-      if(nchar(globalVars$caller)>0) df[i,'caller'] <- globalVars$caller
-      df[i,'dtActed'] <- timeStamp()
-      st$set("patients", df)
 
-      return(df[i,])
-    }
-  }
+  out <- df[which(df$physician==physician),]
 
   Disconnect()
 
-  return(list())
+  return(out)
 }
 
 

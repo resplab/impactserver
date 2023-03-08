@@ -15,7 +15,7 @@ GetTemplateLog <- function()
 
 GetLogs <- function()
 {
-  try({y <- read.table(file="c:\\IMPACTserver\\limpactserver.log", sep = "|"); return(as.data.frame(y))},silent = T)
+  try({y <- read.table(file="c:\\IMPACTserver\\impactserver.log", sep = "|"); return(as.data.frame(y))},silent = T)
 
   return(data.frame())
 }
@@ -39,7 +39,7 @@ AddLog <- function(dt=timeStamp(), source, event, logData=list())
     x$logData<-"[]"
   }
 
-  write.table(x, file="c:\\IMPACTserver\\limpactserver.log", append = T, row.names = F, col.names = F, sep = "|")
+  write.table(x, file="c:\\IMPACTserver\\impactserver.log", append = T, row.names = F, col.names = F, sep = "|")
 
   T
 }
@@ -48,5 +48,5 @@ AddLog <- function(dt=timeStamp(), source, event, logData=list())
 
 FlushLogs <- function()
 {
-  try({file.remove("c:\\IMPACTserver\\limpactserver.log")},silent = T)
+  try({file.remove("c:\\IMPACTserver\\impactserver.log")},silent = T)
 }
