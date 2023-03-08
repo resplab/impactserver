@@ -139,7 +139,7 @@ UpdateAddPatient <- function(patient)
 
   res <- NULL
 
-  if(dim(pt)[1]>0)
+  if(!is.null(pt))
   {
     res <- UpdatePatient(patient)
   }
@@ -160,38 +160,48 @@ UpdateAddPatient <- function(patient)
 
 GetPatient <- function(code, tolerance=1)
 {
+  out <- NULL
   st <- Connect("patients")
 
   if(!st$exists("patients"))
   {
-    return((list()))
-  }
-
-  df <- st$get("patients")
-
-  if(dim(df)[1]==0)
-  {
-    return((list()))
-  }
-
-  if(tolerance>0)
-  {
-    i <- which(gsub("0","9",df$code)==gsub("0","9",code))
-    if(length(i)>1) i <- i[1]
+    out <- NULL
   }
   else
   {
-    i <- which(df$code==code)
+    df <- st$get("patients")
+    if(dim(df)[1]==0)
+    {
+      out <- NULL
+    }
+    else
+    {
+      if(tolerance>0)
+      {
+        i <- which(gsub("0","9",df$code)==gsub("0","9",code))
+        if(length(i)>1) i <- i[1]
+      }
+      else
+      {
+        i <- which(df$code==code)
+      }
+      if(length(i)>0)
+      {
+        df[i,'seen'] <- 1
+        df[i,'dtActed'] <- timeStamp()
+        if(nchar(globalVars$caller)>0) df[i,'caller'] <- globalVars$caller
+        st$set("patients", df)
+        out <- df[i,]
+      }
+      else
+      {
+        out <- NULL
+      }
+    }
   }
 
-  df[i,'seen'] <- 1
-  df[i,'dtActed'] <- timeStamp()
-  if(nchar(globalVars$caller)>0) df[i,'caller'] <- globalVars$caller
-  st$set("patients", df)
-
   Disconnect()
-
-  return(df[i,])
+  return(out)
 }
 
 

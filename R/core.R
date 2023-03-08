@@ -5,7 +5,7 @@
 #' @export
 GetVersionNote <- function()
 {
-  "2023.03.07 (Melting Snow)"
+  "2023.03.08 (Melting Snow)"
 }
 
 
