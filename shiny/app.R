@@ -20,7 +20,7 @@ shinyApp(
       tabsetPanel(type = "tabs",
                   tabPanel("Clinic day", selectInput("clinicDayDateSelector","Which day",c(Sys.Date()-1,Sys.Date(),Sys.Date()+1)),  DTOutput('clinicDay'), actionButton("clinicDay_refresh_btn","Refresh")),
                   tabPanel("Whitelist", DTOutput('whitelist'), actionButton("add_patient_btn", "New patient")),
-                  tabPanel("ACCEPT calculator",h1("Todo")),
+                  tabPanel("ACCEPT calculator", tags$a(href="https://impactstudy.vch.ca/acceptcalc/?accesskey=123456", "Open in new tab", target="newwin"), tags$iframe(src="https://impactstudy.vch.ca/acceptcalc/?accesskey=123456", width="100%", height="1000")),
                   tabPanel("Physicians",DTOutput('physicians'), actionButton("add_physician_btn", "New physician"), actionButton("physicians_refresh_btn","Refresh")),
                   tabPanel("Logs", actionButton("logs_refresh_btn","Refresh"), DTOutput('logs'), actionButton("flush_logs_btn", "Delete logs"))
       )),print(paste("Server version:",GetVersionNote()))
@@ -34,7 +34,7 @@ shinyApp(
       whitelistVars <- c('dtScheduled', 'code','firstName','lastName', 'physician','whitelisted')
 
       clinicDay <- impactserver:::GetPatients()
-      whitelist <- clinicDay[which(clinicDay$whitelisted==T),whitelistVars]
+      whitelist <- clinicDay[which(clinicDay$whitelisted==T | clinicDay$whitelisted==1),whitelistVars]
 
       physicians <- impactserver:::GetUsers()
 
