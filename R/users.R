@@ -92,6 +92,8 @@ AddUser <- function(user)
 #Does not create new physicain
 UpdateUser <- function(user)
 {
+  user$userName <- gsub(" ", "", tolower(user$userName))
+
   success <- F
   st <- Connect("users")
 
@@ -104,7 +106,7 @@ UpdateUser <- function(user)
 
   for(i in 1:dim(df)[1])
   {
-    if(df[i,'userName']==user$userName)
+    if(gsub(" ", "", tolower(df[i,'userName']))==user$userName)
     {
       success <- T
       for(element in names(user))
@@ -150,6 +152,8 @@ AddUpdateUser <- function(user)
 
 GetUser <- function(userName, tolerance=0)
 {
+  userName <- gsub(" ", "", tolower(userName))
+
   st <- Connect("users")
 
   if(!st$exists("users"))

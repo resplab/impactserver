@@ -227,7 +227,7 @@ GetPatientsByPhysician <- function(physician)
 
   out <- NULL
 
-  out <- df[which(df$physician==physician),]
+  out <- df[which(gsub(" ", "", tolower(df$physician))==gsub(" ", "", tolower(physician))),]
 
   Disconnect()
 
