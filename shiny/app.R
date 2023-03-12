@@ -105,7 +105,7 @@ shinyApp(
 
     #whitelistProxy = dataTableProxy('whiteList')
     observeEvent(input$add_patient_btn, {
-      impactserver:::AddPatient(data.frame(code="0123456789", source="CRC", dtScheduled=as.character(Sys.Date()+1), whitelisted=T))
+      impactserver:::AddPatient(data.frame(code="0123456789", source="CRC", dtScheduled=as.character(Sys.Date()+1), whitelisted=1))
       tmp <- GetData()
       dfWhitelist <- tmp$whitelist
       output$whitelist = render_dt(dfWhitelist, 'cell')
