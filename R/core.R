@@ -5,7 +5,7 @@
 #' @export
 GetVersionNote <- function()
 {
-  "2023.03.10 (Spring Near)"
+  "2023.03.13 (Spring Near)"
 }
 
 
